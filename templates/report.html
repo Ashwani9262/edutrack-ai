@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="grid-2">
+  <div class="card report-card">
+    <h3>Study Summary</h3>
+    <p>Total study hours: <strong>{{ total_hours }}</strong></p>
+    <p>Reward points: <strong>{{ total_points }}</strong></p>
+    <p>Average marks: <strong>{{ average_mark }}</strong></p>
+    <a href="{{ url_for('download_report') }}" class="button-primary">Download Report</a>
+  </div>
+  <div class="card report-card">
+    <h3>Subject Performance</h3>
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr><th>Subject</th><th>Score</th><th>Exam Date</th></tr>
+        </thead>
+        <tbody>
+          {% for mark in marks %}
+          <tr>
+            <td>{{ mark.subject }}</td>
+            <td>{{ mark.score }}/{{ mark.max_score }}</td>
+            <td>{{ mark.exam_date }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3">No marks available yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

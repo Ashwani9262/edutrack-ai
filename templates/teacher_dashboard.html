@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<div id="classes" class="grid-3">
+  {% for class in classes %}
+  <div class="card class-card">
+    <h3>{{ class.name }}</h3>
+    <p>{{ class.student_count }} students</p>
+    <p>Avg score: {{ class.avg_score | round(1) if class.avg_score else 'N/A' }}</p>
+    <a href="{{ url_for('class_detail', class_id=class.id) }}" class="button-secondary">View Details</a>
+  </div>
+  {% else %}
+  <div class="card empty-card">
+    <p>No classes assigned yet.</p>
+  </div>
+  {% endfor %}
+</div>
+<div class="card review-card">
+  <h3>Teacher Review System</h3>
+  <p class="section-text">Share constructive feedback with students and maintain a transparent classroom.</p>
+  <form method="POST" action="{{ url_for('feedback') }}">
+    <label>Select student</label>
+    <select name="student_id" required>
+      <option value="">Pick a student</option>
+      {% for student in students %}
+      <option value="{{ student.id }}">{{ student.name }} — {{ student.class_name }}</option>
+      {% endfor %}
+    </select>
+    <label>Class</label>
+    <select name="class_id" required>
+      <option value="">Select class</option>
+      {% for class in classes %}
+      <option value="{{ class.id }}">{{ class.name }}</option>
+      {% endfor %}
+    </select>
+    <label>Feedback</label>
+    <textarea name="feedback" rows="4" placeholder="Provide guidance or praise" required></textarea>
+    <button type="submit" class="button-primary">Submit Feedback</button>
+  </form>
+</div>
+{% endblock %}

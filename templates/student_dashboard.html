@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="grid-3">
+  <div class="card metric-card">
+    <div class="metric-title">Total Study Hours</div>
+    <div class="metric-value">{{ total_hours }}</div>
+    <div class="metric-sub">Tracked across all sessions.</div>
+  </div>
+  <div class="card metric-card">
+    <div class="metric-title">Today's Study</div>
+    <div class="metric-value">{{ today_hours }} hrs</div>
+    <div class="metric-sub">Real-time focus tracking.</div>
+  </div>
+  <div class="card metric-card">
+    <div class="metric-title">Average Marks</div>
+    <div class="metric-value">{{ average_mark }}</div>
+    <div class="metric-sub">Subject performance snapshot.</div>
+  </div>
+</div>
+<div class="grid-2">
+  <div class="card metric-card">
+    <div class="metric-title">Current Grade</div>
+    <div class="metric-value">{{ grade }}</div>
+    <div class="metric-sub">Calculated from your average score.</div>
+  </div>
+  <div class="card metric-card">
+    <div class="metric-title">Current Rank</div>
+    <div class="metric-value">#{{ rank }}</div>
+    <div class="metric-sub">Leaderboard standing among peers.</div>
+  </div>
+</div>
+<div class="grid-2">
+  <div class="card progress-card">
+    <h3>Goal Progress</h3>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: {{ goal_progress }}%"></div>
+    </div>
+    <span>{{ goal_progress }}% achieved</span>
+  </div>
+  <div class="card progress-card">
+    <h3>Predicted Next Score</h3>
+    <div class="prediction-value">{{ prediction.value if prediction.value else 'Pending' }}</div>
+    <p class="small-text">{{ prediction.explanation }}</p>
+  </div>
+</div>
+<div class="grid-2">
+  <div class="card chart-card">
+    <h3>Study Time This Week</h3>
+    <canvas id="studyChart" data-labels="{{ study_labels | tojson }}" data-values="{{ study_values | tojson }}"></canvas>
+  </div>
+  <div class="card chart-card">
+    <h3>Performance Trends</h3>
+    <canvas id="performanceChart" data-labels="{{ performance_labels | tojson }}" data-values="{{ performance_values | tojson }}"></canvas>
+  </div>
+</div>
+<div class="grid-3">
+  <div class="card list-card">
+    <h3>Strong Subjects</h3>
+    <ul>
+      {% for item in strong_subjects %}
+      <li>{{ item }}</li>
+      {% else %}
+      <li>No data yet</li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="card list-card">
+    <h3>Weak Subjects</h3>
+    <ul>
+      {% for item in weak_subjects %}
+      <li>{{ item }}</li>
+      {% else %}
+      <li>No data yet</li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="card list-card">
+    <h3>Class Leaderboard</h3>
+    <ol>
+      {% for item in leaderboard %}
+      <li>{{ item.name }} - {{ item.total_points }} pts</li>
+      {% endfor %}
+    </ol>
+    <p class="small-text">Your rank: {{ rank }}</p>
+  </div>
+</div>
+<div class="grid-2">
+  <div class="card form-card">
+    <h3>Add Exam Marks</h3>
+    <form method="POST" action="{{ url_for('add_marks') }}">
+      <label>Subject</label>
+      <input name="subject" type="text" placeholder="Subject name" required />
+      <label>Score</label>
+      <input name="score" type="number" min="0" max="100" placeholder="0-100" required />
+      <label>Max Score</label>
+      <input name="max_score" type="number" min="1" max="200" value="100" required />
+      <label>Exam Date</label>
+      <input name="exam_date" type="date" />
+      <button type="submit" class="button-primary">Add Marks</button>
+    </form>
+  </div>
+  <div class="card form-card">
+    <h3>Study Session</h3>
+    <div class="session-controls">
+      <button onclick="startSession()" class="button-secondary">Start</button>
+      <button onclick="stopSession()" class="button-primary">Stop</button>
+      <p class="small-text">Focus mode: active tab only.</p>
+    </div>
+    <div class="session-summary">
+      <p>Use the controls to create study sessions and earn bonus points.</p>
+    </div>
+  </div>
+</div>
+<div class="card review-card">
+  <h3>Feedback from Teachers</h3>
+  {% for item in feedbacks %}
+  <div class="review-item">
+    <h4>{{ item.teacher_name }} <span>({{ item.class_name }})</span></h4>
+    <p>{{ item.feedback }}</p>
+    <small>{{ item.created_at[:10] }}</small>
+  </div>
+  {% else %}
+  <p class="small-text">No feedback yet. Ask your teacher to leave a review.</p>
+  {% endfor %}
+</div>
+{% endblock %}

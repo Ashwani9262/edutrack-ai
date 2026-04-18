@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduTrack AI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="EduTrack AI Logo" class="brand-logo">
+        <div>
+          <h1>EduTrack AI</h1>
+          <p>Analytics Dashboard</p>
+        </div>
+      </div>
+      <nav class="nav-menu">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        {% if session.role == 'student' %}
+        <a href="{{ url_for('report') }}">Reports</a>
+        {% else %}
+        <a href="{{ url_for('dashboard') }}#classes">My Classes</a>
+        {% endif %}
+        <a href="{{ url_for('logout') }}" class="logout-link">Logout</a>
+      </nav>
+    </aside>
+    <main class="content">
+      <header class="topbar">
+        <div>
+          <h2>{{ title if title else 'Dashboard' }}</h2>
+          <p class="subtitle">Professional student analytics with modern SaaS styling.</p>
+        </div>
+        <div class="profile-chip">
+          <span>{{ session.name or 'Guest' }}</span>
+          <span class="role-pill">{{ session.role | title }}</span>
+        </div>
+      </header>
+      <section class="page-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+          <div class="alerts">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+      </section>
+    </main>
+  </div>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+</body>
+</html>
