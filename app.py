@@ -1,4 +1,5 @@
 import os
+import io
 import secrets
 import string
 from datetime import datetime, timedelta
@@ -27,8 +28,11 @@ app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 def teardown(exception):
     close_db(exception)
 
-with app.app_context():
-    init_db()
+try:
+    with app.app_context():
+        init_db()
+except Exception as e:
+    print(f"WARNING: Could not initialize database on startup: {e}")
 
 @app.route('/')
 def home():
@@ -39,17 +43,21 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form.get('email', '').strip().lower()
-        password = request.form.get('password', '')
-        user = query_db('SELECT * FROM users WHERE email = ?', (email,), one=True)
-        if user and check_password_hash(user['password'], password):
-            session.clear()
-            session['user_id'] = user['id']
-            session['name'] = user['name']
-            session['role'] = user['role']
-            flash('Welcome back, {}!'.format(user['name']), 'success')
-            return redirect(url_for('dashboard'))
-        flash('Invalid email or password.', 'danger')
+        try:
+            email = request.form.get('email', '').strip().lower()
+            password = request.form.get('password', '')
+            user = query_db('SELECT * FROM users WHERE email = ?', (email,), one=True)
+            if user and check_password_hash(user['password'], password):
+                session.clear()
+                session['user_id'] = user['id']
+                session['name'] = user['name']
+                session['role'] = user['role']
+                flash('Welcome back, {}!'.format(user['name']), 'success')
+                return redirect(url_for('dashboard'))
+            flash('Invalid email or password.', 'danger')
+        except Exception as e:
+            print(f"ERROR in login: {e}")
+            flash('An error occurred during login. Please try again.', 'danger')
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
